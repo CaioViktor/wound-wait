@@ -5,6 +5,8 @@ public class Transacao{
 	private List<Operacao> operacoes;
 	private int operacaoAtual;
 	private String estado;
+	private Dado esperando;
+
 	public Transacao(int identificador){
 		this.identificador = identificador;
 		timestamp = 0;
@@ -44,15 +46,29 @@ public class Transacao{
 		return (operacaoAtual < operacoes.size());
 	}
 	public void abort(){
-		//TODO: abortar operaçao
+		if(!estado.equalsIgnoreCase("FINALIZADA")){
+			estado = "ABORTADA";
+			operacaoAtual = 0;
+			esperando.removeFilaEspera(this);
+		}
 	} 
 	public void start(long timestamp){
-		//TODO: começar operaçao
+		if(!estado.equalsIgnoreCase("FINALIZADA")){
+			this.timestamp = timestamp;
+			estado = "PROCESSANDO";
+		}
 	}
 	public void start(){
-		//TODO: começar operaçao com timestamp atual
+		start(Calendar.getInstance().getTime().getTime());
 	}
-	public void despertar(){
-		//TODO: despertar
+	public void commit(){
+		estado = "FINALIZADA";
 	}
+	public void waitFila(Dado dado){
+		if(!estado.equalsIgnoreCase("FINALIZADA") && !estado.equalsIgnoreCase("ABORTADA") && !estado.equalsIgnoreCase("ESPERANDO")){
+			esperando = dado;
+			estado = "ESPERANDO";
+		}
+	}
+
 }
