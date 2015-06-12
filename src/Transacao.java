@@ -33,7 +33,10 @@ public class Transacao{
 		return estado;
 	}
 	public Operacao getOperacaoAtual(){
-		return operacoes.get(operacaoAtual);
+		if(operacaoAtual < operacoes.size())
+			return operacoes.get(operacaoAtual);
+		else
+			return null;
 	}
 	public void passarOperacao(){
 		if(operacaoAtual < operacoes.size())
