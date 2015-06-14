@@ -1,0 +1,2 @@
+T1:r(x)w(y)w(x)c()
+T2:w(x)r(y)r(x)c()
