@@ -1,19 +1,21 @@
 public class Read extends Operacao{
 
 	//Construtor
-	public Read( int identificador, Dado dado ){
+	public Read( Transacao transacao , Dado dado ){
 		
-		setIdentificadorTransacao( identificador );
+		setTransacao( transacao );
+
+		setIdentificadorTransacao( transacao.getIdentificador() );
 		
 		setDado( dado );
 		
 	}
 	
 	//Metodo
-	public boolean operar(){
-		
-		return true;
-		
+	public String toString(){
+		String string;
+		string = "r" + getIdentificadorTransacao() + "("+ getDado().getIdentificador() +")";
+		return string;
 	}
 	
 }

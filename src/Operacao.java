@@ -1,8 +1,9 @@
 public abstract class Operacao{
 	
 	//atributos
-	protected Dado dado;
-	protected int identificadorTransacao;
+	private Dado dado;
+	private int identificadorTransacao;
+	private Transacao transacao;
 	
 	//Getters and Setters
 	public Dado getDado() {
@@ -17,8 +18,19 @@ public abstract class Operacao{
 	public void setIdentificadorTransacao(int identificadorTransacao) {
 		this.identificadorTransacao = identificadorTransacao;
 	}
+	public void setTransacao(Transacao transacao){
+		this.transacao = transacao;
+	}
+	public Transacao getTransacao(){
+		return transacao;
+	}
 	
 	//Metodos abstratos
-	public abstract boolean operar();
+	public boolean operar(){
+		if(dado.isBloqueado())
+			return false;
+		dado.setBloqueio(transacao);
+		return true;
+	}
 	
 }

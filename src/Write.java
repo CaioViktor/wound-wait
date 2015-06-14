@@ -1,19 +1,21 @@
 public class Write extends Operacao{
 	
 	//Construtor
-	public Write( int identificador, Dado dado ){
+	public Write( Transacao transacao , Dado dado ){
 		
-		setIdentificadorTransacao( identificador );
+		setTransacao( transacao );
+
+		setIdentificadorTransacao( transacao.getIdentificador() );
 		
 		setDado( dado );
 		
 	}
 	
 	//Metodo
-	public boolean operar(){
-		
-		return true;
-		
+	public String toString(){
+		String string;
+		string = "w" + getIdentificadorTransacao() + "("+ getDado().getIdentificador() +")";
+		return string;
 	}
 	
 	

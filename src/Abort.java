@@ -1,22 +1,24 @@
 public class Abort extends Operacao{
-
-	//Atributos
-	private Transacao transacao;
 	
 	//Construtor
-	public Abort( int identificador, Transacao transacao ){
+	public Abort( Transacao transacao ){
 		
-		setIdentificadorTransacao( identificador );
+		setIdentificadorTransacao( transacao.getIdentificador() );
 		
-		this.transacao = transacao;		
+		setTransacao( transacao );		
 		
 	}
 		
 	//Metodo
 	public boolean operar(){
-		
+		getTransacao().abort();
 		return true;
 		
+	}
+	public String toString(){
+		String string;
+		string = "a" + getIdentificadorTransacao() + "()";
+		return string;
 	}
 	
 }

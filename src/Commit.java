@@ -1,22 +1,24 @@
 public class Commit extends Operacao{
 
-	//Atributo
-	private Transacao transacao;
-
 	//Construtor
-	public Commit( int identificador, Transacao transacao ){
+	public Commit( Transacao transacao ){
 		
-		setIdentificadorTransacao( identificador );
+		setIdentificadorTransacao( transacao.getIdentificador() );
 		
-		this.transacao = transacao;		
+		setTransacao( transacao );		
 	
 	}
 		
 	//Metodo
 	public boolean operar(){
-		
+		getTransacao().commit();
 		return true;
 		
+	}
+	public String toString(){
+		String string;
+		string = "c" + getIdentificadorTransacao() + "()";
+		return string;
 	}
 	
 }
