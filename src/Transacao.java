@@ -1,5 +1,5 @@
 import java.util.*;
-public class Transacao{
+public class Transacao implements Comparator<Transacao>{
 	private int identificador;
 	private long timestamp;
 	private List<Operacao> operacoes;
@@ -13,6 +13,20 @@ public class Transacao{
 		operacoes = new ArrayList<>();
 		operacaoAtual = 0;
 		estado = "PRONTA";
+	}
+	public int compare(Transacao t1, Transacao t2){
+		int r = (int)(t2.getTimestamp() - t1.getTimestamp());
+		return r;
+	}
+	public boolean equals(Object t1){
+		if(!(t1 instanceof Transacao))
+			return false;
+		if(this == t1)
+			return true;
+		Transacao t2 = (Transacao)t1;
+		if((this.getIdentificador() == t2.getIdentificador()) && (this.operacoes.equals(t2.operacoes)))
+			return true;
+		return false;
 	}
 	public int getIdentificador(){
 		return identificador;

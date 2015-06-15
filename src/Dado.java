@@ -1,63 +1,58 @@
+import java.util.*;
 public class Dado{
 	private String identificador;
-	private FilaTransacao filaEspera;
-	// private Transacao bloqueioLeitura;
-	// private Transacao bloqueioEscrita;
-	private Transacao bloqueio;
+	private TreeSet<Transacao> filaEspera;
+	private Set<Transacao> bloqueioLeitura;
+	private Transacao bloqueioEscrita;
+
 	public Dado(String identificador){
 		this.identificador = identificador;
-		filaEspera = new FilaTransacao();
-		// bloqueioEscrita = null;
-		// bloqueioLeitura = null;
-		bloqueio = null;
+		filaEspera = new TreeSet<>();
+		bloqueioEscrita = null;
+		bloqueioLeitura = new HashSet<>();
+
 	}
 	public String getIdentificador(){
 		return identificador;
 	}
-	// public boolean isBloqueadoLeitura(){
-	// 	if(bloqueioLeitura == null)
-	// 		return false;
-	// 	return true;
-	// }
-	// public boolean isBloqueadoEscrita(){
-	// 	if(bloqueioEscrita == null)
-	// 		return false;
-	// 	return true;
-	// }
-	public boolean isBloqueado(){
-		if(bloqueio == null)
+	public boolean isBloqueadoLeitura(){
+		if(bloqueioLeitura.isEmpty())
 			return false;
 		return true;
 	}
-	// public Transacao getBloqueioLeitura(){
-	// 	return bloqueioLeitura;
-	// }
-	// public Transacao getBloqueioEscrita(){
-	// 	return bloqueioEscrita;
-	// }
-	public Transacao getBloqueio(){
-		return bloqueio;
+	public boolean isBloqueadoEscrita(){
+		if(bloqueioEscrita == null)
+			return false;
+		return true;
 	}
 
-	// public void setBloqueioLeitura(Transacao transacao){
-	// 	bloqueioLeitura = transacao;
-	// }
-	// public void setBloqueioEscrita(Transacao transacao){
-	// 	bloqueioEscrita = transacao;
-	// }
-	public void setBloqueio(Transacao transacao){
-		bloqueio = transacao;
+	public Set<Transacao> getBloqueioLeitura(){
+		return bloqueioLeitura;
 	}
+	public Transacao getBloqueioEscrita(){
+		return bloqueioEscrita;
+	}
+
+
+	public void setBloqueioLeitura(Transacao transacao){
+		bloqueioLeitura.add(transacao);
+	}
+	public void setBloqueioEscrita(Transacao transacao){
+		bloqueioEscrita = transacao;
+	}
+
 	public void addFilaEspera(Transacao transacao){
-		// filaEspera.append(transacao);
+		filaEspera.add(transacao);
 	}
 	public void removeFilaEspera(Transacao transacao){
-		// filaEspera.removeTransacao(transacao);
+		filaEspera.remove(transacao);
 	}
 	public void removeFilaEspera(){
-		// filaEspera.removeInicio();
+		filaEspera.remove(filaEspera.first());
 	}
 	public void notificarFilaEspera(){
 		// filaEspera.getInicio().start(filaEspera.getInicio().getTimestamp());
+		filaEspera.first().start(filaEspera.first().getTimestamp());
+		removeFilaEspera();
 	}
 }
