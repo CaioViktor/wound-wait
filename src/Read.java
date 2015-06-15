@@ -17,5 +17,7 @@ public class Read extends Operacao{
 		string = "r" + getIdentificadorTransacao() + "("+ getDado().getIdentificador() +")";
 		return string;
 	}
-	
+	public boolean operar(){
+		return super.operar();
+	}
 }

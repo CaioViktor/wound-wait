@@ -18,5 +18,12 @@ public class Write extends Operacao{
 		return string;
 	}
 	
-	
+	public boolean operar(){
+		if(!super.operar())
+			return false;
+		if(!getDado().isBloqueadoLeitura())
+			return true;
+		//TODO: Verificar lista se algum timestamp é maior para matá-los
+		return true;
+	}
 }
