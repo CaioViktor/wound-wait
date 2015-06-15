@@ -15,7 +15,7 @@ public class Transacao implements Comparator<Transacao>{
 		estado = "PRONTA";
 	}
 	public int compare(Transacao t1, Transacao t2){
-		int r = (int)(t2.getTimestamp() - t1.getTimestamp());
+		int r = (int)(t1.getTimestamp() - t2.getTimestamp());
 		return r;
 	}
 	public boolean equals(Object t1){
