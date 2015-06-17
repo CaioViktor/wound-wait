@@ -25,9 +25,11 @@ public abstract class Operacao{
 		return transacao;
 	}
 	
-	//Metodos abstratos
-	public boolean operar(){
-		return !dado.isBloqueadoEscrita();
+	public boolean isConflito(){
+		return false;
 	}
+
+	//Metodos abstratos
+	public abstract boolean operar();
 	
 }

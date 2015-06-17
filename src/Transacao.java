@@ -1,5 +1,5 @@
 import java.util.*;
-public class Transacao implements Comparator<Transacao>{
+public class Transacao implements Comparable<Transacao>{
 	private int identificador;
 	private long timestamp;
 	private List<Operacao> operacoes;
@@ -14,8 +14,8 @@ public class Transacao implements Comparator<Transacao>{
 		operacaoAtual = 0;
 		estado = "PRONTA";
 	}
-	public int compare(Transacao t1, Transacao t2){
-		int r = (int)(t1.getTimestamp() - t2.getTimestamp());
+	public int compareTo(Transacao t2){
+		int r = (int)(this.getTimestamp() - t2.getTimestamp());
 		return r;
 	}
 	public boolean equals(Object t1){

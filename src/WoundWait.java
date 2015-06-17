@@ -14,6 +14,7 @@ public class WoundWait{
 	private static BufferedWriter bufferOut;
 
 	public static void main(String args[]){
+		
 		dados = new HashMap<>();
 		transacoes = new ArrayList<>();
 		if(args.length == 2){
@@ -40,6 +41,9 @@ public class WoundWait{
 		}
 	}
 
+
+
+	//Ler arquivo de entrada
 	public static void lerEntrada() throws Exception{
 		String linha;
 

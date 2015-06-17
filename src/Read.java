@@ -17,7 +17,14 @@ public class Read extends Operacao{
 		string = "r" + getIdentificadorTransacao() + "("+ getDado().getIdentificador() +")";
 		return string;
 	}
+
+	public boolean isConflito(){
+		return getDado().isBloqueadoEscrita();
+	}
+
 	public boolean operar(){
-		return super.operar();
+		Dado dado = getDado();
+		dado.setBloqueioLeitura(getTransacao());
+		return true;
 	}
 }

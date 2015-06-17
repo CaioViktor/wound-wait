@@ -12,14 +12,17 @@ public class Dado{
 		bloqueioLeitura = new HashSet<>();
 
 	}
+
 	public String getIdentificador(){
 		return identificador;
 	}
+
 	public boolean isBloqueadoLeitura(){
 		if(bloqueioLeitura.isEmpty())
 			return false;
 		return true;
 	}
+
 	public boolean isBloqueadoEscrita(){
 		if(bloqueioEscrita == null)
 			return false;
@@ -29,6 +32,7 @@ public class Dado{
 	public Set<Transacao> getBloqueioLeitura(){
 		return bloqueioLeitura;
 	}
+	
 	public Transacao getBloqueioEscrita(){
 		return bloqueioEscrita;
 	}
@@ -37,6 +41,7 @@ public class Dado{
 	public void setBloqueioLeitura(Transacao transacao){
 		bloqueioLeitura.add(transacao);
 	}
+
 	public void setBloqueioEscrita(Transacao transacao){
 		bloqueioEscrita = transacao;
 	}
@@ -44,12 +49,15 @@ public class Dado{
 	public void addFilaEspera(Transacao transacao){
 		filaEspera.add(transacao);
 	}
+
 	public void removeFilaEspera(Transacao transacao){
 		filaEspera.remove(transacao);
 	}
+
 	public void removeFilaEspera(){
 		filaEspera.remove(filaEspera.first());
 	}
+
 	public void notificarFilaEspera(){
 		// filaEspera.getInicio().start(filaEspera.getInicio().getTimestamp());
 		filaEspera.first().start(filaEspera.first().getTimestamp());
