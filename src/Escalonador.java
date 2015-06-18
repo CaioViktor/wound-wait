@@ -1,10 +1,51 @@
 import java.util.*;
 public class Escalonador{
-	
-	public void escalonar(){
-		Operacao operacaoAtual = null;
+	private List<Transacao> transacoes;
+	private List<Operacao> operacoesEntrada;
+	private List<Operacao> operacoesSaida;
+	private boolean deadLock;
+	private List<Transacao> transacoesAbortadas;
+	private List<Transacao> transacoesEfetivadas;
 
-		//TODO: Maneira de conseguir operação atual
+	public Escalonador(List<Transacao> transacoes,List<Operacao> operacoesEntrada){
+		this.transacoes = transacoes;
+		this.operacoesEntrada = operacoesEntrada;
+		deadLock = false;
+		operacoesSaida = new ArrayList<>();
+		transacoesAbortadas = new ArrayList<>();
+		transacoesEfetivadas = new ArrayList<>();
+	}
+
+	public List<Operacao> getOperacoesEntrada(){
+		return operacoesEntrada;
+	}
+
+	public List<Operacao> getOperacoesSaida(){
+		return  operacoesSaida;
+	}
+
+	public List<Transacao> getTransacoesAbortadas(){
+		return transacoesAbortadas;
+	}
+
+	public List<Transacao> getTransacoesEfetivadas(){
+		return  transacoesEfetivadas;
+	}
+
+	public boolean getDeadLock(){
+		return deadLock;
+	}
+
+	// private Operacao escolherOperacao(){
+	// 	//TODO: Escolher qual operação executar
+	// }
+	// //Método para escalonar
+	// public void escalonar(){
+	// 	//Loop em tadas as transações
+	// }
+
+	//Dada a operação ele faz a operação do wound-wait
+	public void operar(Operacao operacaoAtual){
 		
 		if(!operacaoAtual.isConflito()) // não há conflito entre operações
 			operacaoAtual.operar();
