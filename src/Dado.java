@@ -5,6 +5,11 @@ public class Dado{
 	private Set<Transacao> bloqueioLeitura;
 	private Transacao bloqueioEscrita;
 
+
+	public String toString(){
+		return getIdentificador() + ":" + (isBloqueadoLeitura()||isBloqueadoEscrita());
+	}
+
 	public Dado(String identificador){
 		this.identificador = identificador;
 		filaEspera = new TreeSet<>();
@@ -32,7 +37,7 @@ public class Dado{
 	public Set<Transacao> getBloqueioLeitura(){
 		return bloqueioLeitura;
 	}
-	
+
 	public Transacao getBloqueioEscrita(){
 		return bloqueioEscrita;
 	}

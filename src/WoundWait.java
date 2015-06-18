@@ -15,6 +15,22 @@ public class WoundWait{
 
 	public static void main(String args[]){
 		
+		//Testes
+		Transacao t1 = new Transacao(1);
+		Dado d1 = new Dado("D1");
+		Operacao op1 = new Read(t1,d1);
+		Operacao op2 = new Abort(t1);
+		t1.addOperacao(op1);
+		t1.addOperacao(op2);
+
+		System.out.println(t1 + "\n" + d1);
+		t1.start();
+		op1.operar();
+		System.out.println(t1 + "\n" + d1);
+		op2.operar();
+		System.out.println(t1 + "\n" + d1);
+		//Testes
+
 		dados = new HashMap<>();
 		transacoes = new ArrayList<>();
 		if(args.length == 2){

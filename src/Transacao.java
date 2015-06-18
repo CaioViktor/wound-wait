@@ -7,6 +7,10 @@ public class Transacao implements Comparable<Transacao>{
 	private String estado;
 	private Dado esperando;
 
+	public String toString(){
+		return getIdentificador() + " : " + getTimestamp() + " : " + getEstado();
+	}
+
 	public Transacao(int identificador){
 		this.identificador = identificador;
 		timestamp = 0;
@@ -14,10 +18,12 @@ public class Transacao implements Comparable<Transacao>{
 		operacaoAtual = 0;
 		estado = "PRONTA";
 	}
+
 	public int compareTo(Transacao t2){
 		int r = (int)(this.getTimestamp() - t2.getTimestamp());
 		return r;
 	}
+
 	public boolean equals(Object t1){
 		if(!(t1 instanceof Transacao))
 			return false;
@@ -28,58 +34,85 @@ public class Transacao implements Comparable<Transacao>{
 			return true;
 		return false;
 	}
+
 	public int getIdentificador(){
 		return identificador;
 	}
+
 	public long getTimestamp(){
 		return timestamp;
 	}
+
 	public void setTimestamp(long timestamp){
 		this.timestamp = timestamp;
 	}
+
 	public void setTimestamp(){
+		
 		setTimestamp(Calendar.getInstance().getTime().getTime());
 	}
+
 	public void setEstado(String estado){
 		this.estado = estado;
 	}
+
 	public String getEstado(){
 		return estado;
 	}
+
 	public Operacao getOperacaoAtual(){
 		if(operacaoAtual < operacoes.size())
 			return operacoes.get(operacaoAtual);
 		else
 			return null;
 	}
+
 	public void passarOperacao(){
 		if(operacaoAtual < operacoes.size())
 			operacaoAtual++;
 	}
+
 	public void addOperacao(Operacao operacao){
 		operacoes.add(operacao);
 	}
+
 	public boolean hasProximaOperacao(){
 		return (operacaoAtual < operacoes.size());
 	}
+
 	public void abort(){
 		if(!estado.equalsIgnoreCase("FINALIZADA")){
 			estado = "ABORTADA";
 			operacaoAtual = 0;
-			esperando.removeFilaEspera(this);
+			liberarBloqueios();
 		}
 	} 
+
 	public void start(long timestamp){
 		if(!estado.equalsIgnoreCase("FINALIZADA")){
 			this.timestamp = timestamp;
 			estado = "PROCESSANDO";
 		}
 	}
+
 	public void start(){
 		start(Calendar.getInstance().getTime().getTime());
 	}
+
 	public void commit(){
+		liberarBloqueios();
 		estado = "FINALIZADA";
+	}
+	private void liberarBloqueios(){
+		for(Operacao o : operacoes){
+			if(o.getDado() != null){
+				Dado dadoOperacao = o.getDado();
+				dadoOperacao.removeFilaEspera(this);
+				if(dadoOperacao.getBloqueioEscrita() != null && dadoOperacao.getBloqueioEscrita().equals(this))//Remove o bloqueio se tiver bloqueio de escrita 
+					dadoOperacao.setBloqueioEscrita(null);
+				dadoOperacao.getBloqueioLeitura().remove(this);//Remove o bloqueio se tiver de leitura
+			}
+		}
 	}
 	public void waitFila(Dado dado){
 		if(!estado.equalsIgnoreCase("FINALIZADA") && !estado.equalsIgnoreCase("ABORTADA") && !estado.equalsIgnoreCase("ESPERANDO")){
