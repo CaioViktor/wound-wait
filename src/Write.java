@@ -1,3 +1,4 @@
+import java.util.*;
 public class Write extends Operacao{
 	
 	//Construtor
@@ -19,7 +20,20 @@ public class Write extends Operacao{
 	}
 	
 	public boolean isConflito(){
-		return (getDado().isBloqueadoLeitura() || getDado().isBloqueadoEscrita());
+		Dado dado = getDado();
+		if(!dado.isBloqueadoEscrita() && !dado.isBloqueadoLeitura())
+			return false;
+		boolean conflito = false;
+		if(dado.isBloqueadoEscrita() && !dado.getBloqueioEscrita().equals(this))
+			conflito = true;
+		if(dado.isBloqueadoLeitura()){
+			Set<Transacao> bloqueios = dado.getBloqueioLeitura();
+			if(bloqueios.size() == 1 && bloqueios.contains(getTransacao()))
+				conflito = conflito || false;
+			else
+				conflito = true;
+		}
+		return conflito;
 	}
 	public boolean operar(){
 		

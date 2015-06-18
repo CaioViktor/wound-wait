@@ -1,5 +1,6 @@
 import java.util.*;
 public class Escalonador{
+	private int transacaoDaVez;
 	private List<Transacao> transacoes;
 	private List<Operacao> operacoesEntrada;
 	private List<Operacao> operacoesSaida;
@@ -14,6 +15,7 @@ public class Escalonador{
 		operacoesSaida = new ArrayList<>();
 		transacoesAbortadas = new ArrayList<>();
 		transacoesEfetivadas = new ArrayList<>();
+		transacaoDaVez = 0;
 	}
 
 	public List<Operacao> getOperacoesEntrada(){
@@ -36,78 +38,121 @@ public class Escalonador{
 		return deadLock;
 	}
 
-	// private Operacao escolherOperacao(){
-	// 	//TODO: Escolher qual operação executar
-	// }
-	// //Método para escalonar
-	// public void escalonar(){
-	// 	//Loop em tadas as transações
-	// }
+	private Operacao escolherOperacao(){
+		//TODO: Escolher qual operação executar
+		Transacao transacaoAtual = transacoes.get(transacaoDaVez);
+		// System.out.print(transacaoAtual);
+		if(!transacaoAtual.getEstado().equalsIgnoreCase("PROCESSANDO"))//Se a transação não estiver livre para processar ela é pulada
+			return null;
+		return transacaoAtual.getOperacaoAtual();
+
+	}
+	//Método para escalonar
+	public List<Operacao> escalonar(){
+		//Loop em tadas as transações
+		int transacoesConcluidas = 0;
+		// int c = 0;
+		while(transacoesConcluidas < transacoes.size() ){
+			// c++;
+			Operacao operacaoAtual = escolherOperacao();
+			// System.out.println("Transação atual: " + transacaoDaVez + " : " + operacaoAtual  + "\tTransações concluidas: " + transacoesConcluidas);
+			if(operacaoAtual != null){
+				if(operar(operacaoAtual)){
+					operacoesSaida.add(operacaoAtual);
+					operacaoAtual.getTransacao().passarOperacao();
+				}
+				if(operacaoAtual instanceof Commit){
+					transacoesConcluidas++;
+					transacoesEfetivadas.add(operacaoAtual.getTransacao());
+				}
+			}
+
+			//Faz escolha circular de transações para operarem
+			transacaoDaVez++;
+			if(transacaoDaVez >= transacoes.size())
+				transacaoDaVez = 0;
+			//Faz escolha circular de transações para operarem
+			// for(Operacao o:operacoesSaida)
+			// 	System.out.print(o);
+			// System.out.println();
+		}
+		return operacoesSaida;
+	}
 
 	//Dada a operação ele faz a operação do wound-wait
-	public void operar(Operacao operacaoAtual){
+	private boolean operar(Operacao operacaoAtual){
 		
-		if(!operacaoAtual.isConflito()) // não há conflito entre operações
+		if(!operacaoAtual.isConflito()){// não há conflito entre operações
 			operacaoAtual.operar();
-		else{//há conflitos
-			Transacao transacaoAtual = operacaoAtual.getTransacao();
-			Transacao transacaoBloqueiaDado = null;
-			Dado dadoAcessado = operacaoAtual.getDado();
-			if(operacaoAtual instanceof Read){
+			return true;
+		} 
+		//há conflitos
+		Transacao transacaoAtual = operacaoAtual.getTransacao();
+		Transacao transacaoBloqueiaDado = null;
+		Dado dadoAcessado = operacaoAtual.getDado();
+		if(operacaoAtual instanceof Read){
+			transacaoBloqueiaDado = dadoAcessado.getBloqueioEscrita();
+			if(transacaoAtual.compareTo(transacaoBloqueiaDado) < 0){//Transação atual é mais antiga
+				
+				transacaoBloqueiaDado.abort();
+				operacoesSaida.add(new Abort(transacaoBloqueiaDado));
+				transacaoBloqueiaDado.start(transacaoBloqueiaDado.getTimestamp());//Recomeça transação parada com o mesmo timestamp
+				
+				operacaoAtual.operar();
+				return true;
+			}else{
+				transacaoAtual.waitFila(dadoAcessado);
+				dadoAcessado.addFilaEspera(transacaoAtual);
+				return false;
+			}
+		}//Fim do conflito de Read
+
+		else if(operacaoAtual instanceof Write){
+
+			if(dadoAcessado.isBloqueadoEscrita()){//Dado está com bloqueio exclusivo para escrita
+
 				transacaoBloqueiaDado = dadoAcessado.getBloqueioEscrita();
 				if(transacaoAtual.compareTo(transacaoBloqueiaDado) < 0){//Transação atual é mais antiga
 					
 					transacaoBloqueiaDado.abort();
+					operacoesSaida.add(new Abort(transacaoBloqueiaDado));
 					transacaoBloqueiaDado.start(transacaoBloqueiaDado.getTimestamp());//Recomeça transação parada com o mesmo timestamp
 					
 					operacaoAtual.operar();
+					return true;
 				}else{
 					transacaoAtual.waitFila(dadoAcessado);
 					dadoAcessado.addFilaEspera(transacaoAtual);
-				}
-			}//Fim do conflito de Read
-
-			else if(operacaoAtual instanceof Write){
-
-				if(dadoAcessado.isBloqueadoEscrita()){//Dado está com bloqueio exclusivo para escrita
-
-					transacaoBloqueiaDado = dadoAcessado.getBloqueioEscrita();
-					if(transacaoAtual.compareTo(transacaoBloqueiaDado) < 0){//Transação atual é mais antiga
-						
-						transacaoBloqueiaDado.abort();
-						transacaoBloqueiaDado.start(transacaoBloqueiaDado.getTimestamp());//Recomeça transação parada com o mesmo timestamp
-						
-						operacaoAtual.operar();
-					}else{
-						transacaoAtual.waitFila(dadoAcessado);
-						dadoAcessado.addFilaEspera(transacaoAtual);
-					}
-
-				}else{//Dado está com bloqueio compartilhado para leitura
-					Set<Transacao> listaTrasacoesBloqueioEscrita = dadoAcessado.getBloqueioLeitura();
-					Set<Transacao> transacoesMaisNovas = new HashSet<>();
-					for(Transacao t:listaTrasacoesBloqueioEscrita){//Percorre lista de transações que bloquearam o dado e seleciona as mais novas que a transação atual
-						if(transacaoAtual.compareTo(t) < 0){//Trasação atual é mais antiga
-							transacoesMaisNovas.add(t); //pode dar erro aqui pelo uso do for e não do iterator
-						}
-					}
-					for(Transacao t:transacoesMaisNovas){//Mata transações mais novas
-						listaTrasacoesBloqueioEscrita.remove(t);//pode dar erro pelo uso do for
-						t.abort();
-						t.start(t.getTimestamp());//Recomeça transação parada com o mesmo timestamp
-					}
-					if(operacaoAtual.isConflito()){//Verifica se ainda há conflito
-						transacaoAtual.waitFila(dadoAcessado);
-						dadoAcessado.addFilaEspera(transacaoAtual);
-					}else{//Não há mais conflito
-						operacaoAtual.operar();
-					}
+					return false;
 				}
 
-			}//Fim conflito de Write
-		}//Fim dos conflitos
+			}else{//Dado está com bloqueio compartilhado para leitura
+				Set<Transacao> listaTrasacoesBloqueioEscrita = dadoAcessado.getBloqueioLeitura();
+				Set<Transacao> transacoesMaisNovas = new HashSet<>();
+				for(Transacao t:listaTrasacoesBloqueioEscrita){//Percorre lista de transações que bloquearam o dado e seleciona as mais novas que a transação atual
+					if(transacaoAtual.compareTo(t) < 0){//Trasação atual é mais antiga
+						transacoesMaisNovas.add(t); //pode dar erro aqui pelo uso do for e não do iterator
+					}
+				}
+				for(Transacao t:transacoesMaisNovas){//Mata transações mais novas
+					listaTrasacoesBloqueioEscrita.remove(t);//pode dar erro pelo uso do for
+					t.abort();
+					operacoesSaida.add(new Abort(t));
+					t.start(t.getTimestamp());//Recomeça transação parada com o mesmo timestamp
+				}
+				if(operacaoAtual.isConflito()){//Verifica se ainda há conflito
+					transacaoAtual.waitFila(dadoAcessado);
+					dadoAcessado.addFilaEspera(transacaoAtual);
+					return false;
+				}else{//Não há mais conflito
+					operacaoAtual.operar();
+					return true;
+				}
+			}
 
+		}//Fim conflito de Write
 
+		return false;
 
-	}//Fim do escalonamento	
+	}//Fim da operação
 }

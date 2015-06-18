@@ -19,7 +19,12 @@ public class Read extends Operacao{
 	}
 
 	public boolean isConflito(){
-		return getDado().isBloqueadoEscrita();
+		Dado dado = getDado();
+		if(!dado.isBloqueadoEscrita())
+			return false;
+		if(dado.getBloqueioEscrita().equals(getTransacao()))
+			return false;
+		return true;
 	}
 
 	public boolean operar(){

@@ -5,22 +5,25 @@ public class Transacao implements Comparable<Transacao>{
 	private List<Operacao> operacoes;
 	private int operacaoAtual;
 	private String estado;
-	private Dado esperando;
+	public Dado esperando;
 
 	public String toString(){
-		return getIdentificador() + " : " + getTimestamp() + " : " + getEstado();
+		return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
 	}
 
 	public Transacao(int identificador){
 		this.identificador = identificador;
-		timestamp = 0;
 		operacoes = new ArrayList<>();
 		operacaoAtual = 0;
-		estado = "PRONTA";
+		timestamp = 0;
+		estado = "PROCESSANDO";
+		start();
 	}
 
 	public int compareTo(Transacao t2){
 		int r = (int)(this.getTimestamp() - t2.getTimestamp());
+		if(r == 0 && !this.equals(t2))
+			r = 1;
 		return r;
 	}
 
@@ -108,9 +111,10 @@ public class Transacao implements Comparable<Transacao>{
 			if(o.getDado() != null){
 				Dado dadoOperacao = o.getDado();
 				dadoOperacao.removeFilaEspera(this);
+				dadoOperacao.removeListaLeitura(this);//Remove o bloqueio se tiver de leitura
 				if(dadoOperacao.getBloqueioEscrita() != null && dadoOperacao.getBloqueioEscrita().equals(this))//Remove o bloqueio se tiver bloqueio de escrita 
 					dadoOperacao.setBloqueioEscrita(null);
-				dadoOperacao.getBloqueioLeitura().remove(this);//Remove o bloqueio se tiver de leitura
+
 			}
 		}
 	}
