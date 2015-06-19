@@ -8,7 +8,12 @@ public class Transacao implements Comparable<Transacao>{
 	public Dado esperando;
 
 	public String toString(){
-		return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
+		// return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
+		return "T"+getIdentificador();
+	}
+
+	public boolean isPrimeiraOperacao(){
+		return (operacaoAtual == 0);
 	}
 
 	public Transacao(int identificador){
@@ -23,7 +28,7 @@ public class Transacao implements Comparable<Transacao>{
 	public int compareTo(Transacao t2){
 		int r = (int)(this.getTimestamp() - t2.getTimestamp());
 		if(r == 0 && !this.equals(t2))
-			r = 1;
+			r = this.getIdentificador() - t2.getIdentificador();
 		return r;
 	}
 

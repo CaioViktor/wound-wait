@@ -7,6 +7,7 @@ public class WoundWait{
 	
 	private static HashMap<String,Dado> dados;
 	private static ArrayList<Transacao> transacoes;
+	private static List<Operacao> operacoesEntrada;
 	private static Escalonador escalonador;
 	private static FileReader inFile;
 	private static FileWriter outFile;
@@ -33,6 +34,7 @@ public class WoundWait{
 
 		dados = new HashMap<>();
 		transacoes = new ArrayList<>();
+		operacoesEntrada = new ArrayList<>();
 		if(args.length == 2){
 			try{
 				inFile = new FileReader(args[0]);
@@ -44,9 +46,10 @@ public class WoundWait{
 
 				lerEntrada();
 				// testar();
-
-				escalonador = new Escalonador(transacoes,null);
-				testarSaida();
+				entrarListaEntrada();
+				System.out.println("Entrada: " + operacoesEntrada);
+				escalonador = new Escalonador(transacoes,operacoesEntrada);
+				gravarSaida();
 
 				bufferIn.close();
 				inFile.close();
@@ -60,6 +63,41 @@ public class WoundWait{
 	}
 
 
+	public static void entrarListaEntrada(){
+		int transacoesConcluidas = 0;
+		Scanner in = new Scanner(System.in);
+		while(transacoesConcluidas < transacoes.size()){
+			int indiceTransacao = 0;
+			int operacaoSelecionada;
+			System.out.println("Selecione a próxima operação:");
+			for(Transacao t : transacoes){
+				if(t.hasProximaOperacao()){
+					System.out.println(indiceTransacao + ") " + t.getOperacaoAtual());
+				}
+				indiceTransacao++;
+			}
+			operacaoSelecionada = in.nextInt();
+			if( (operacaoSelecionada >= 0 && operacaoSelecionada < transacoes.size()) && transacoes.get(operacaoSelecionada).hasProximaOperacao()){//Verifica se operação selecionada é válida
+				
+				Transacao transacaoSelecionada = transacoes.get(operacaoSelecionada);
+				Operacao operacao = transacaoSelecionada.getOperacaoAtual();
+				operacoesEntrada.add(operacao);
+
+				if(transacaoSelecionada.isPrimeiraOperacao()){//Atualiza o timestamp caso seja a primeira operação
+					transacaoSelecionada.setTimestamp();
+				}
+
+				transacaoSelecionada.passarOperacao();
+				if(operacao instanceof Commit)
+					transacoesConcluidas++;
+
+			}
+		}
+		for(Transacao t : transacoes){//Reinicia as transações
+			t.abort();
+			t.start(t.getTimestamp());
+		}
+	}
 
 	//Ler arquivo de entrada
 	public static void lerEntrada() throws Exception{
@@ -125,9 +163,38 @@ public class WoundWait{
 		}
 	}
 
-	public static void gravarSaida(){
+	public static void gravarSaida() throws Exception{
+		List<Operacao> listaSaida = escalonador.escalonar();
+		List<Operacao> listaEntrada = escalonador.getOperacoesEntrada();
+		List<Transacao> listaAbortadas = escalonador.getTransacoesAbortadas();
+		List<Transacao> listaEfetivadas = escalonador.getTransacoesEfetivadas();
 
+		bufferOut.write("Schedule de Entrada: ");
+		for(Operacao entrada:listaEntrada)
+			bufferOut.write(entrada.toString());
+		bufferOut.newLine();
+
+		bufferOut.write("Schedule de Saída: ");
+		for(Operacao saida:listaSaida)
+			bufferOut.write(saida.toString());
+		bufferOut.newLine();
+
+		bufferOut.write("Deadlock: " +escalonador.getDeadLock() );
+		bufferOut.newLine();
+
+		bufferOut.write("Transações Abortadas: ");
+		for(Transacao abortadas:listaAbortadas)
+			bufferOut.write(abortadas.toString() + ",");
+		bufferOut.newLine();
+
+		bufferOut.write("Transações Efetivadas: ");
+		for(Transacao efetivadas:listaEfetivadas)
+			bufferOut.write(efetivadas.toString() + ",");
+		bufferOut.newLine();
+
+		bufferOut.flush();
 	}
+
 	public static void testar(){
 		System.out.println("Dados:");
 		for(Dado dado : dados.values())
@@ -142,6 +209,7 @@ public class WoundWait{
 			System.out.println();
 		}
 	}
+
 	public static void testarSaida(){
 		List<Operacao> testeSaida = escalonador.escalonar();
 		System.out.println("Escalonamento de Saída");

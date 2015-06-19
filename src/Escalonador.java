@@ -52,7 +52,19 @@ public class Escalonador{
 		//Loop em tadas as transações
 		int transacoesConcluidas = 0;
 		// int c = 0;
-		while(transacoesConcluidas < transacoes.size() ){
+		for(Operacao operacaoAtual:operacoesEntrada){//Tenta executar as operção da lista de entrada
+			// System.out.println(operacaoAtual.getTransacao());
+			if(operacaoAtual.equals(operacaoAtual.getTransacao().getOperacaoAtual()) && operar(operacaoAtual)){ // Verifica se a operção da lista de entrada é realmente a próxima operação da transação e se ele pode ser feita
+				operacoesSaida.add(operacaoAtual);
+				operacaoAtual.getTransacao().passarOperacao();
+				if(operacaoAtual instanceof Commit){
+					transacoesConcluidas++;
+					transacoesEfetivadas.add(operacaoAtual.getTransacao());
+				}
+			}
+		}
+
+		while(transacoesConcluidas < transacoes.size() ){//Passa a executar as transações que não puderam concluir
 			// c++;
 			Operacao operacaoAtual = escolherOperacao();
 			// System.out.println("Transação atual: " + transacaoDaVez + " : " + operacaoAtual  + "\tTransações concluidas: " + transacoesConcluidas);
@@ -60,10 +72,10 @@ public class Escalonador{
 				if(operar(operacaoAtual)){
 					operacoesSaida.add(operacaoAtual);
 					operacaoAtual.getTransacao().passarOperacao();
-				}
-				if(operacaoAtual instanceof Commit){
-					transacoesConcluidas++;
-					transacoesEfetivadas.add(operacaoAtual.getTransacao());
+					if(operacaoAtual instanceof Commit){
+						transacoesConcluidas++;
+						transacoesEfetivadas.add(operacaoAtual.getTransacao());
+					}
 				}
 			}
 
@@ -79,9 +91,12 @@ public class Escalonador{
 		return operacoesSaida;
 	}
 
+
+
 	//Dada a operação ele faz a operação do wound-wait
 	private boolean operar(Operacao operacaoAtual){
-		
+		if(! operacaoAtual.getTransacao().getEstado().equalsIgnoreCase("PROCESSANDO")) //Verifica se a transação está disponível
+			return false;
 		if(!operacaoAtual.isConflito()){// não há conflito entre operações
 			operacaoAtual.operar();
 			return true;
