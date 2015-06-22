@@ -5,7 +5,7 @@ public class Transacao implements Comparable<Transacao>{
 	private List<Operacao> operacoes;
 	private int operacaoAtual;
 	private String estado;
-	private Espera esperando;
+	private Map<Dado,Espera> esperando;
 
 	public String toString(){
 		// return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
@@ -21,7 +21,7 @@ public class Transacao implements Comparable<Transacao>{
 		operacoes = new ArrayList<>();
 		operacaoAtual = 0;
 		timestamp = 0;
-		esperando = new Espera();
+		esperando = new HashMap<>();
 		estado = "PROCESSANDO";
 		start();
 	}
@@ -139,7 +139,7 @@ public class Transacao implements Comparable<Transacao>{
 		}
 	}
 
-	public Espera getEsperando(){
+	public Map<Dado,Espera> getEsperando(){
 		return esperando;
 	}
 

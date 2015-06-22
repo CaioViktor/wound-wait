@@ -118,7 +118,14 @@ public class Escalonador{
 				return true;
 			}else{
 				if(!transacaoAtual.equals(transacaoBloqueiaDado)){
-					Espera esperando = transacaoAtual.getEsperando();
+					Map<Dado,Espera> listEsperando = transacaoAtual.getEsperando();
+					Espera esperando;
+					if(listEsperando.containsKey(dadoAcessado))
+						esperando = listEsperando.get(dadoAcessado);
+					 else{
+					 	esperando = new Espera();
+						listEsperando.put(dadoAcessado,esperando);
+					 }
 					esperando.setDadoEspera(dadoAcessado);
 					esperando.addTransacao(transacaoBloqueiaDado);
 
@@ -146,9 +153,17 @@ public class Escalonador{
 				}else{
 					if(!transacaoAtual.equals(transacaoBloqueiaDado)){
 						// System.out.println("Fo2");
-						Espera esperando = transacaoAtual.getEsperando();
+						Map<Dado,Espera> listEsperando = transacaoAtual.getEsperando();
+						Espera esperando;
+						if(listEsperando.containsKey(dadoAcessado))
+							esperando = listEsperando.get(dadoAcessado);
+						 else{
+						 	esperando = new Espera();
+							listEsperando.put(dadoAcessado,esperando);
+						 }
 						esperando.setDadoEspera(dadoAcessado);
 						esperando.addTransacao(transacaoBloqueiaDado);
+
 						transacaoAtual.waitFila(dadoAcessado);
 						dadoAcessado.addFilaEspera(transacaoAtual);
 						return false;
@@ -159,14 +174,21 @@ public class Escalonador{
 			}else{//Dado está com bloqueio compartilhado para leitura
 				Set<Transacao> listaTrasacoesBloqueioEscrita = dadoAcessado.getBloqueioLeitura();
 				Set<Transacao> transacoesMaisNovas = new HashSet<>();
-				Espera esperando = transacaoAtual.getEsperando();
+				Map<Dado,Espera> listEsperando = transacaoAtual.getEsperando();
 				for(Transacao t:listaTrasacoesBloqueioEscrita){//Percorre lista de transações que bloquearam o dado e seleciona as mais novas que a transação atual
 					if(transacaoAtual.compareTo(t) < 0){//Trasação atual é mais antiga
 						transacoesMaisNovas.add(t); //pode dar erro aqui pelo uso do for e não do iterator
 						// System.out.println("Mais nova " + t);
 					}else{
 						// System.out.println("esperando " + t + "\tno "+ dadoAcessado);
+						Espera esperando;
 						if(!transacaoAtual.equals(t)){
+							if(listEsperando.containsKey(dadoAcessado))
+								esperando = listEsperando.get(dadoAcessado);
+							 else{
+							 	esperando = new Espera();
+								listEsperando.put(dadoAcessado,esperando);
+							 }
 							esperando.setDadoEspera(dadoAcessado);
 							esperando.addTransacao(t);
 						}

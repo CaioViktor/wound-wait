@@ -1,6 +1,6 @@
-Schedule de Entrada: r1(x)r3(z)r2(y)w2(x)c3()w1(y)c1()c2()
-Schedule de Saída: r1(x)r3(z)r2(y)c3()a2()w1(y)c1()r2(y)w2(x)c2()
+Schedule de Entrada: r1(x)r2(x)r3(x)w1(x)w2(x)w3(x)r1(y)r2(y)r3(y)w1(y)w2(y)w3(y)r1(z)r2(z)r3(z)w1(z)w2(z)w3(z)w1(z)w2(z)w3(z)c1()c2()c3()
+Schedule de Saída: r1(x)r2(x)r3(x)a2()a3()w1(x)r1(y)w1(y)r1(z)w1(z)w1(z)c1()r2(x)r3(x)a3()w2(x)r2(y)w2(y)r2(z)w2(z)w2(z)c2()r3(x)w3(x)r3(y)w3(y)r3(z)w3(z)w3(z)c3()
 Deadlock: false
 Transações Abortadas: 
-Transações Efetivadas: T3,T1,T2,
-T2 --> T1	Por: x
+Transações Efetivadas: T1,T2,T3,
+T3 --> T2	Por: x

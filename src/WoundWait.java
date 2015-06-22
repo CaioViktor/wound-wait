@@ -194,11 +194,12 @@ public class WoundWait{
 		bufferOut.newLine();
 
 		for(Transacao transacao : transacoes){
-			Espera esperando = transacao.getEsperando();
-			for(Transacao gerouEspera : esperando.getTransacoesEspera()){
-				bufferOut.write(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
-				System.out.print(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
-			}
+			// Map<Dado,Espera> esperando = transacao.getEsperando();
+			for(Espera esperando :transacao.getEsperando().values())
+				for(Transacao gerouEspera : esperando.getTransacoesEspera()){
+					bufferOut.write(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
+					System.out.print(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
+				}
 		}
 
 		bufferOut.flush();
