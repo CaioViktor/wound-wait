@@ -50,7 +50,7 @@ public class Dado{
 	public void removeListaLeitura(Transacao transacao){
 		if(bloqueioLeitura.contains(transacao)){
 			bloqueioLeitura.remove(transacao);
-			if(bloqueioLeitura.isEmpty() || (bloqueioLeitura.size() == 1 && bloqueioLeitura.contains(filaEspera.first()))){ //não há bloqueio ou Sobrou apenas um elemento no bloqueio de leitura, mas ele estava para por querer de escrita
+			if(bloqueioLeitura.isEmpty() || (bloqueioLeitura.size() == 1 && (!filaEspera.isEmpty() && bloqueioLeitura.contains(filaEspera.first() ) ) ) ) { //não há bloqueio ou Sobrou apenas um elemento no bloqueio de leitura, mas ele estava para por querer de escrita
 				notificarFilaEspera();
 			}
 		}

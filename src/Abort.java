@@ -11,6 +11,7 @@ public class Abort extends Operacao{
 		
 	//Metodo
 	public boolean operar(){
+		// System.out.println("Abort " + getTransacao());
 		getTransacao().abort();
 		return true;
 		

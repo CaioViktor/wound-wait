@@ -5,7 +5,7 @@ public class Transacao implements Comparable<Transacao>{
 	private List<Operacao> operacoes;
 	private int operacaoAtual;
 	private String estado;
-	public Espera esperando;
+	private Espera esperando;
 
 	public String toString(){
 		// return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
@@ -113,13 +113,20 @@ public class Transacao implements Comparable<Transacao>{
 		estado = "FINALIZADA";
 	}
 	private void liberarBloqueios(){
+		// System.out.println("LiberandoBloqueios");
 		for(Operacao o : operacoes){
 			if(o.getDado() != null){
+				// System.out.println("LiberandoBloqueios1");
 				Dado dadoOperacao = o.getDado();
+				// System.out.println("LiberandoBloqueios2");
 				dadoOperacao.removeFilaEspera(this);
+				// System.out.println("LiberandoBloqueios3");
 				dadoOperacao.removeListaLeitura(this);//Remove o bloqueio se tiver de leitura
-				if(dadoOperacao.getBloqueioEscrita() != null && dadoOperacao.getBloqueioEscrita().equals(this))//Remove o bloqueio se tiver bloqueio de escrita 
+				// System.out.println("LiberandoBloqueios4");
+				if(dadoOperacao.getBloqueioEscrita() != null && dadoOperacao.getBloqueioEscrita().equals(this)){//Remove o bloqueio se tiver bloqueio de escrita 
+					// System.out.println("LiberandoBloqueios5 ");
 					dadoOperacao.setBloqueioEscrita(null);
+				}
 
 			}
 		}

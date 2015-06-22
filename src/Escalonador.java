@@ -53,17 +53,18 @@ public class Escalonador{
 		int transacoesConcluidas = 0;
 		// int c = 0;
 		for(Operacao operacaoAtual:operacoesEntrada){//Tenta executar as operção da lista de entrada
-			// System.out.println(operacaoAtual.getTransacao());
-			if(operacaoAtual.equals(operacaoAtual.getTransacao().getOperacaoAtual()) && operar(operacaoAtual)){ // Verifica se a operção da lista de entrada é realmente a próxima operação da transação e se ele pode ser feita
+			// System.out.println(operacaoAtual+" : " + operacaoAtual.getTransacao().getOperacaoAtual() + operacaoAtual.equals(operacaoAtual.getTransacao().getOperacaoAtual()));
+			// System.out.println(operacaoAtual.getTransacao().operacoes);
+			if( operacaoAtual.equals(operacaoAtual.getTransacao().getOperacaoAtual()) && operar(operacaoAtual)){ // Verifica se a operção da lista de entrada é realmente a próxima operação da transação e se ele pode ser feita
 				operacoesSaida.add(operacaoAtual);
 				operacaoAtual.getTransacao().passarOperacao();
+				// System.out.println(operacaoAtual.getTransacao().getOperacaoAtual());
 				if(operacaoAtual instanceof Commit){
 					transacoesConcluidas++;
 					transacoesEfetivadas.add(operacaoAtual.getTransacao());
 				}
 			}
 		}
-
 		while(transacoesConcluidas < transacoes.size() ){//Passa a executar as transações que não puderam concluir
 			// c++;
 			Operacao operacaoAtual = escolherOperacao();
@@ -85,7 +86,7 @@ public class Escalonador{
 				transacaoDaVez = 0;
 			//Faz escolha circular de transações para operarem
 			// for(Operacao o:operacoesSaida)
-			// 	System.out.print(o);
+				// System.out.print(o);
 			// System.out.println();
 		}
 		return operacoesSaida;
@@ -116,13 +117,16 @@ public class Escalonador{
 				operacaoAtual.operar();
 				return true;
 			}else{
-				Espera esperando = transacaoAtual.getEsperando();
-				esperando.setDadoEspera(dadoAcessado);
-				esperando.addTransacao(transacaoBloqueiaDado);
+				if(!transacaoAtual.equals(transacaoBloqueiaDado)){
+					Espera esperando = transacaoAtual.getEsperando();
+					esperando.setDadoEspera(dadoAcessado);
+					esperando.addTransacao(transacaoBloqueiaDado);
 
-				transacaoAtual.waitFila(dadoAcessado);
-				dadoAcessado.addFilaEspera(transacaoAtual);
-				return false;
+					transacaoAtual.waitFila(dadoAcessado);
+					dadoAcessado.addFilaEspera(transacaoAtual);
+					return false;
+				}
+				return true;
 			}
 		}//Fim do conflito de Read
 
@@ -132,7 +136,7 @@ public class Escalonador{
 
 				transacaoBloqueiaDado = dadoAcessado.getBloqueioEscrita();
 				if(transacaoAtual.compareTo(transacaoBloqueiaDado) < 0){//Transação atual é mais antiga
-					
+					System.out.println("Fo1");
 					transacaoBloqueiaDado.abort();
 					operacoesSaida.add(new Abort(transacaoBloqueiaDado));
 					transacaoBloqueiaDado.start(transacaoBloqueiaDado.getTimestamp());//Recomeça transação parada com o mesmo timestamp
@@ -140,13 +144,16 @@ public class Escalonador{
 					operacaoAtual.operar();
 					return true;
 				}else{
-					Espera esperando = transacaoAtual.getEsperando();
-					esperando.setDadoEspera(dadoAcessado);
-					esperando.addTransacao(transacaoBloqueiaDado);
-
-					transacaoAtual.waitFila(dadoAcessado);
-					dadoAcessado.addFilaEspera(transacaoAtual);
-					return false;
+					if(!transacaoAtual.equals(transacaoBloqueiaDado)){
+						// System.out.println("Fo2");
+						Espera esperando = transacaoAtual.getEsperando();
+						esperando.setDadoEspera(dadoAcessado);
+						esperando.addTransacao(transacaoBloqueiaDado);
+						transacaoAtual.waitFila(dadoAcessado);
+						dadoAcessado.addFilaEspera(transacaoAtual);
+						return false;
+					}
+					return true;
 				}
 
 			}else{//Dado está com bloqueio compartilhado para leitura
@@ -156,22 +163,34 @@ public class Escalonador{
 				for(Transacao t:listaTrasacoesBloqueioEscrita){//Percorre lista de transações que bloquearam o dado e seleciona as mais novas que a transação atual
 					if(transacaoAtual.compareTo(t) < 0){//Trasação atual é mais antiga
 						transacoesMaisNovas.add(t); //pode dar erro aqui pelo uso do for e não do iterator
+						// System.out.println("Mais nova " + t);
 					}else{
-						esperando.setDadoEspera(dadoAcessado);
-						esperando.addTransacao(t);
+						// System.out.println("esperando " + t + "\tno "+ dadoAcessado);
+						if(!transacaoAtual.equals(t)){
+							esperando.setDadoEspera(dadoAcessado);
+							esperando.addTransacao(t);
+						}
 					}
 				}
+				// System.out.println("Vai matar");	
 				for(Transacao t:transacoesMaisNovas){//Mata transações mais novas
+					// System.out.println("matando");	
 					listaTrasacoesBloqueioEscrita.remove(t);//pode dar erro pelo uso do for
+					// System.out.println("matando2 " + t);	
 					t.abort();
+					// System.out.println("matando3");	
 					operacoesSaida.add(new Abort(t));
+					// System.out.println("matando4");	
 					t.start(t.getTimestamp());//Recomeça transação parada com o mesmo timestamp
+					// System.out.println("Matou " + t);
 				}
 				if(operacaoAtual.isConflito()){//Verifica se ainda há conflito
+					// System.out.println("conflito");	
 					transacaoAtual.waitFila(dadoAcessado);
 					dadoAcessado.addFilaEspera(transacaoAtual);
 					return false;
 				}else{//Não há mais conflito
+					// System.out.println("nop");	
 					operacaoAtual.operar();
 					return true;
 				}

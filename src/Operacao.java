@@ -4,7 +4,15 @@ public abstract class Operacao{
 	private Dado dado;
 	private int identificadorTransacao;
 	private Transacao transacao;
-	
+	private int id;
+	public boolean equals(Object o){
+		if(!(o instanceof Operacao))
+			return false;
+		Operacao operacao = (Operacao) o;
+		if(this == operacao)
+			return true;
+		return false;
+	}
 	//Getters and Setters
 	public Dado getDado() {
 		return dado;

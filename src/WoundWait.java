@@ -16,22 +16,6 @@ public class WoundWait{
 
 	public static void main(String args[]){
 		
-		// //Testes
-		// Transacao t1 = new Transacao(1);
-		// Dado d1 = new Dado("D1");
-		// Operacao op1 = new Read(t1,d1);
-		// Operacao op2 = new Abort(t1);
-		// t1.addOperacao(op1);
-		// t1.addOperacao(op2);
-
-		// System.out.println(t1 + "\n" + d1);
-		// t1.start();
-		// op1.operar();
-		// System.out.println(t1 + "\n" + d1);
-		// op2.operar();
-		// System.out.println(t1 + "\n" + d1);
-		// //Testes
-
 		dados = new HashMap<>();
 		transacoes = new ArrayList<>();
 		operacoesEntrada = new ArrayList<>();
@@ -47,8 +31,8 @@ public class WoundWait{
 				lerEntrada();
 				// testar();
 				entrarListaEntrada();
-				// System.out.println("Entrada: " + operacoesEntrada);
 				escalonador = new Escalonador(transacoes,operacoesEntrada);
+				// System.out.println("Entrada: " + operacoesEntrada);
 				gravarSaida();
 
 				bufferIn.close();
@@ -58,7 +42,7 @@ public class WoundWait{
 				System.out.println(e);
 			}
 		}else{
-			System.out.println("Erro na passagem de Argumentos:\n Devem haver 2 argumentos.\nEx.:\njava WoundWait ArquivoEntrada.txt ArquivoSaisa.txt");
+			System.out.println("Erro na passagem de Argumentos:\n Devem haver 2 argumentos.\nEx.:\njava WoundWait ArquivoEntrada.txt ArquivoSaida.txt");
 		}
 	}
 
@@ -164,10 +148,10 @@ public class WoundWait{
 	}
 
 	public static void gravarSaida() throws Exception{
-		List<Operacao> listaSaida = escalonador.escalonar();
 		List<Operacao> listaEntrada = escalonador.getOperacoesEntrada();
-		List<Transacao> listaAbortadas = escalonador.getTransacoesAbortadas();
 		List<Transacao> listaEfetivadas = escalonador.getTransacoesEfetivadas();
+		List<Transacao> listaAbortadas = escalonador.getTransacoesAbortadas();
+		List<Operacao> listaSaida = escalonador.escalonar();
 
 		bufferOut.write("Schedule de Entrada: ");
 		System.out.println("Schedule de Entrada: ");
@@ -212,8 +196,8 @@ public class WoundWait{
 		for(Transacao transacao : transacoes){
 			Espera esperando = transacao.getEsperando();
 			for(Transacao gerouEspera : esperando.getTransacoesEspera()){
-				bufferOut.write(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera());
-				System.out.print(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera());
+				bufferOut.write(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
+				System.out.print(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera() + "\n");
 			}
 		}
 
