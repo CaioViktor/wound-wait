@@ -7,7 +7,8 @@ public class Dado{
 
 
 	public String toString(){
-		return getIdentificador() + ":" + (isBloqueadoLeitura()||isBloqueadoEscrita()) +" : "+ bloqueioEscrita+" : "+ bloqueioLeitura;
+		// return getIdentificador() + ":" + (isBloqueadoLeitura()||isBloqueadoEscrita()) +" : "+ bloqueioEscrita+" : "+ bloqueioLeitura;
+		return getIdentificador();
 	}
 
 	public Dado(String identificador){

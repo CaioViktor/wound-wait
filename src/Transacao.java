@@ -5,7 +5,7 @@ public class Transacao implements Comparable<Transacao>{
 	private List<Operacao> operacoes;
 	private int operacaoAtual;
 	private String estado;
-	public Dado esperando;
+	public Espera esperando;
 
 	public String toString(){
 		// return getIdentificador() + " : " + getTimestamp() + " : " + getEstado() + " : " + getOperacaoAtual();
@@ -21,6 +21,7 @@ public class Transacao implements Comparable<Transacao>{
 		operacoes = new ArrayList<>();
 		operacaoAtual = 0;
 		timestamp = 0;
+		esperando = new Espera();
 		estado = "PROCESSANDO";
 		start();
 	}
@@ -125,9 +126,14 @@ public class Transacao implements Comparable<Transacao>{
 	}
 	public void waitFila(Dado dado){
 		if(!estado.equalsIgnoreCase("FINALIZADA") && !estado.equalsIgnoreCase("ABORTADA") && !estado.equalsIgnoreCase("ESPERANDO")){
-			esperando = dado;
+			// esperando = dado;
+			// System.out.println("Houve espera");
 			estado = "ESPERANDO";
 		}
+	}
+
+	public Espera getEsperando(){
+		return esperando;
 	}
 
 }

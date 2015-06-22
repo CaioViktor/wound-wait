@@ -47,13 +47,13 @@ public class WoundWait{
 				lerEntrada();
 				// testar();
 				entrarListaEntrada();
-				System.out.println("Entrada: " + operacoesEntrada);
+				// System.out.println("Entrada: " + operacoesEntrada);
 				escalonador = new Escalonador(transacoes,operacoesEntrada);
 				gravarSaida();
 
 				bufferIn.close();
 				inFile.close();
-
+				System.out.println();
 			}catch(Exception e){
 				System.out.println(e);
 			}
@@ -170,27 +170,52 @@ public class WoundWait{
 		List<Transacao> listaEfetivadas = escalonador.getTransacoesEfetivadas();
 
 		bufferOut.write("Schedule de Entrada: ");
-		for(Operacao entrada:listaEntrada)
+		System.out.println("Schedule de Entrada: ");
+		for(Operacao entrada:listaEntrada){
 			bufferOut.write(entrada.toString());
+			System.out.print(entrada.toString());
+		}
+		System.out.println();
 		bufferOut.newLine();
 
 		bufferOut.write("Schedule de Saída: ");
-		for(Operacao saida:listaSaida)
+		System.out.println("Schedule de Saída: ");
+		for(Operacao saida:listaSaida){
 			bufferOut.write(saida.toString());
+			System.out.print(saida.toString());
+		}
+		System.out.println();
 		bufferOut.newLine();
 
 		bufferOut.write("Deadlock: " +escalonador.getDeadLock() );
+		System.out.println("Deadlock: " +escalonador.getDeadLock() );
 		bufferOut.newLine();
 
 		bufferOut.write("Transações Abortadas: ");
-		for(Transacao abortadas:listaAbortadas)
+		System.out.println("Transações Abortadas: ");
+		for(Transacao abortadas:listaAbortadas){
 			bufferOut.write(abortadas.toString() + ",");
+			System.out.print(abortadas.toString() + ",");
+		}
+		System.out.println();
 		bufferOut.newLine();
 
 		bufferOut.write("Transações Efetivadas: ");
-		for(Transacao efetivadas:listaEfetivadas)
+		System.out.print("Transações Efetivadas: ");
+		for(Transacao efetivadas:listaEfetivadas){
 			bufferOut.write(efetivadas.toString() + ",");
+			System.out.print(efetivadas.toString() + ",");
+		}
+		System.out.println();
 		bufferOut.newLine();
+
+		for(Transacao transacao : transacoes){
+			Espera esperando = transacao.getEsperando();
+			for(Transacao gerouEspera : esperando.getTransacoesEspera()){
+				bufferOut.write(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera());
+				System.out.print(transacao + " --> " + gerouEspera + "\tPor: " + esperando. getDadoEspera());
+			}
+		}
 
 		bufferOut.flush();
 	}

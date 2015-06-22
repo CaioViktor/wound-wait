@@ -116,6 +116,10 @@ public class Escalonador{
 				operacaoAtual.operar();
 				return true;
 			}else{
+				Espera esperando = transacaoAtual.getEsperando();
+				esperando.setDadoEspera(dadoAcessado);
+				esperando.addTransacao(transacaoBloqueiaDado);
+
 				transacaoAtual.waitFila(dadoAcessado);
 				dadoAcessado.addFilaEspera(transacaoAtual);
 				return false;
@@ -136,6 +140,10 @@ public class Escalonador{
 					operacaoAtual.operar();
 					return true;
 				}else{
+					Espera esperando = transacaoAtual.getEsperando();
+					esperando.setDadoEspera(dadoAcessado);
+					esperando.addTransacao(transacaoBloqueiaDado);
+
 					transacaoAtual.waitFila(dadoAcessado);
 					dadoAcessado.addFilaEspera(transacaoAtual);
 					return false;
@@ -144,9 +152,13 @@ public class Escalonador{
 			}else{//Dado está com bloqueio compartilhado para leitura
 				Set<Transacao> listaTrasacoesBloqueioEscrita = dadoAcessado.getBloqueioLeitura();
 				Set<Transacao> transacoesMaisNovas = new HashSet<>();
+				Espera esperando = transacaoAtual.getEsperando();
 				for(Transacao t:listaTrasacoesBloqueioEscrita){//Percorre lista de transações que bloquearam o dado e seleciona as mais novas que a transação atual
 					if(transacaoAtual.compareTo(t) < 0){//Trasação atual é mais antiga
 						transacoesMaisNovas.add(t); //pode dar erro aqui pelo uso do for e não do iterator
+					}else{
+						esperando.setDadoEspera(dadoAcessado);
+						esperando.addTransacao(t);
 					}
 				}
 				for(Transacao t:transacoesMaisNovas){//Mata transações mais novas
